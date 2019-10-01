@@ -1,0 +1,25 @@
+version: '2.2'
+
+services:
+
+  redis:
+    image: redis:5.0.2
+    command: redis-server --appendonly yes --save 300 10
+    volumes:
+      - ${REDIS_VOLUMES}:/data
+
+  formula-data:
+    image: qyvlik/formula-data
+    volumes:
+      - ./formula-data/fetch-config.json:/home/www/formula-data/fetch-config.json:ro
+      - ./.env:/home/www/formula-data/.env:ro
+
+  formula:
+    image: qyvlik/formula
+    volumes:
+      - ./formula/application.yml:/home/www/application.yml:ro
+      - ./formula/application-prod.yml:/home/www/application-prod.yml:ro
+    depends_on:
+      - redis
+    ports:
+      - "8120:8120"
